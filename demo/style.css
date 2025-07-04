@@ -4,48 +4,30 @@ body {
 }
 
 /* 拖拉檔案區域樣式 */
-.file-drop-zone {
+.file-drop-zone-inline {
+  position: relative;
+  /* 讓內部絕對定位的 input 有個參考點 */
   border: 2px dashed #ccc;
-  border-radius: 8px;
-  padding: 20px;
+  padding: 25px;
   text-align: center;
-  margin: 10px auto;
-  background-color: #f9f9f9;
   cursor: pointer;
-  transition: all 0.3s ease;
-  width: 80%;
-  max-width: 600px;
-  min-height: 100px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  background-color: #f9f9f9;
 }
 
-.file-drop-zone:hover {
-  border-color: #337ab7;
-  background-color: #f0f8ff;
+.file-drop-zone-inline:hover {
+  background-color: #f0f0f0;
 }
 
-.file-drop-zone.drag-over {
-  border-color: #337ab7;
-  background-color: #e6f3ff;
-  transform: scale(1.02);
-}
-
-.file-drop-zone-text {
-  font-size: 16px;
-  color: #555;
-  margin-bottom: 10px;
-}
-
-.file-drop-zone-hint {
-  font-size: 14px;
-  color: #888;
-}
-
+/* 這是隱藏 input 的最佳實踐 */
 .file-input-hidden {
-  display: none;
+  /* 讓 input 看不見也無法點擊，但功能上存在 */
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+  /* 把它放到後面，確保不會意外覆蓋到其他元素 */
 }
 
 header {

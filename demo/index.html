@@ -369,6 +369,14 @@
         const fileDropZone = document.getElementById('fileDropZone');
         const fileInput = document.getElementById('fileInput');
         const streamURL = document.getElementById('streamURL');
+        let currentBlobUrl = null; // 追蹤當前的 Blob URL
+        // 清理舊的 Blob URL
+        function cleanupBlobUrl() {
+          if (currentBlobUrl) {
+            URL.revokeObjectURL(currentBlobUrl);
+            currentBlobUrl = null;
+          }
+        }
         // 點擊區域開啟檔案選擇器
         fileDropZone.addEventListener('click', function () {
           fileInput.click();
@@ -406,16 +414,32 @@
           const reader = new FileReader();
           reader.onload = function (e) {
             const content = e.target.result;
-            // 這裡可以處理檔案內容，例如解析 M3U8 檔案
-            // 暫時將檔案名稱設置到 URL 輸入框
-            streamURL.value = file.name;
-            console.log('檔案內容:', content);
+            // 清理舊的 Blob URL
+            cleanupBlobUrl();
+            // 創建一個 Blob URL 來播放檔案
+            const blob = new Blob([content], { type: 'application/vnd.apple.mpegurl' });
+            const url = URL.createObjectURL(blob);
+            currentBlobUrl = url;
+            // 設置到 URL 輸入框
+            streamURL.value = url;
             // 更新拖拉區域的顯示
             const dropZoneText = fileDropZone.querySelector('.file-drop-zone-text');
             dropZoneText.textContent = '已選擇檔案: ' + file.name;
+            // 清除下拉選單選擇
+            const streamSelect = document.getElementById('streamSelect');
+            if (streamSelect) {
+              streamSelect.value = '';
+            }
+            // 觸發 streamURL 的 change 事件來載入新的串流
+            const changeEvent = new Event('change');
+            streamURL.dispatchEvent(changeEvent);
+            console.log('已載入 HLS 檔案:', file.name);
+            console.log('檔案內容:', content);
           };
           reader.readAsText(file);
         }
+        // 頁面卸載時清理 Blob URL
+        window.addEventListener('beforeunload', cleanupBlobUrl);
       });
     </script>
     <!-- demo build -->
