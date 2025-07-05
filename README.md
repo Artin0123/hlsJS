@@ -1,7 +1,4 @@
-## [Link](https://artin0123.github.io/hlsJS/demo/index.html)
-[basic-usage](https://artin0123.github.io/hlsJS/demo/basic-usage.html)  
-[benchmark](https://artin0123.github.io/hlsJS/demo/benchmark.html)  
-[metrics.html](https://artin0123.github.io/hlsJS/demo/metrics.html)  
+## [Basic usage](https://artin0123.github.io/hlsJS/demo/basic-usage.html)
 
 [![npm](https://img.shields.io/npm/v/hls.js.svg?style=flat)](https://npmjs.org/package/hls.js)
 [![npm](https://img.shields.io/npm/v/hls.js/canary.svg?style=flat)](https://www.npmjs.com/package/hls.js/v/canary)
@@ -11,7 +8,7 @@
 
 [comment]: <> ([![Sauce Test Status]&#40;https://saucelabs.com/browser-matrix/robwalch.svg&#41;]&#40;https://saucelabs.com/u/robwalch&#41;)
 
-# ![HLS.js](https://raw.githubusercontent.com/video-dev/hls.js/master/docs/logo.svg)
+# [![HLS.js](https://raw.githubusercontent.com/video-dev/hls.js/master/docs/logo.svg)](https://github.com/video-dev/hls.js)
 
 HLS.js is a JavaScript library that implements an [HTTP Live Streaming] client.
 It relies on [HTML5 video][] and [MediaSource Extensions][] for playback.
