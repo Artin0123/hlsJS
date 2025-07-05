@@ -14,437 +14,387 @@
   </head>
 
   <body>
-    <div class="main-container">
-      <header>
-      </header>
-      <div id="controls">
-        <div class="demo-controls-wrapper">
-          <select id="streamSelect" class="innerControls">
-            <option value="" selected>
-              Select a test-stream from drop-down menu. Or enter custom URL
-              below
-            </option>
+    <br />
+    <select id="streamSelect" class="innerControls">
+      <option value="" selected>
+        Select a test-stream from drop-down menu. Or enter custom URL
+        below
+      </option>
+    </select>
+    <div class="stream-input-container">
+      <input id="streamURL" class="innerControls" type="text" value="" />
+      <button id="pasteUrlBtn" onclick="pasteFromClipboard()">Paste URL</button>
+    </div>
+    <br />
+    <video id="video" controls autoplay playsinline class="videoCentered"></video>
+    <div id="controls">
+      <div class="demo-controls-wrapper">
+        <label class="innerControls"
+          title="Uncheck this to disable loading of streams selected from the drop-down above.">
+          Enable streaming:
+          <input id="enableStreaming" type="checkbox" checked />
+        </label>
+        <label class="innerControls"
+          title="When a media error occurs, attempt to recover playback by calling `hls.recoverMediaError()`.">
+          Auto-recover media-errors:
+          <input id="autoRecoverError" type="checkbox" checked />
+        </label>
+        <label class="innerControls"
+          title="Stop loading and playback if playback under-buffer stalls. This can help debug stall errors.">
+          Stop on first stall:
+          <input id="stopOnStall" type="checkbox" unchecked />
+        </label>
+        <label class="innerControls">
+          Dump transmuxed fMP4 data:
+          <input id="dumpfMP4" type="checkbox" unchecked />
+        </label>
+        <label class="innerControls">
+          Metrics history (max limit, -1 is unlimited):
+          <input id="limitMetrics" style="width: 8em" type="number" />
+        </label>
+        <label class="innerControls">
+          HTML video element width:
+          <select id="videoSize" style="float: right">
+            <option value="240px">240px</option>
+            <option value="426px">426px</option>
+            <option value="640px">640px</option>
+            <option value="720px">720px</option>
+            <option value="854px">854px</option>
+            <option value="1280px">1280px</option>
+            <option value="1920px">1920px</option>
+            <option value="80%">Responsive (80%)</option>
+            <option value="100%">Responsive (100%)</option>
           </select>
-          <input id="streamURL" class="innerControls" type="text" value="" />
-          <div class="file-drop-zone-inline" id="fileDropZone">
-            <div class="file-drop-zone-text">
-              拖拉 HLS 檔案到這裡 (m3u, m3u8) 或點擊選擇檔案
-            </div>
-            <input type="file" id="fileInput" class="file-input-hidden" accept=".m3u,.m3u8" />
-          </div>
-          <label class="innerControls"
-            title="Uncheck this to disable loading of streams selected from the drop-down above.">
-            Enable streaming:
-            <input id="enableStreaming" type="checkbox" checked />
-          </label>
-          <label class="innerControls"
-            title="When a media error occurs, attempt to recover playback by calling `hls.recoverMediaError()`.">
-            Auto-recover media-errors:
-            <input id="autoRecoverError" type="checkbox" checked />
-          </label>
-          <label class="innerControls"
-            title="Stop loading and playback if playback under-buffer stalls. This can help debug stall errors.">
-            Stop on first stall:
-            <input id="stopOnStall" type="checkbox" unchecked />
-          </label>
-          <label class="innerControls">
-            Dump transmuxed fMP4 data:
-            <input id="dumpfMP4" type="checkbox" unchecked />
-          </label>
-          <label class="innerControls">
-            Metrics history (max limit, -1 is unlimited):
-            <input id="limitMetrics" style="width: 8em" type="number" />
-          </label>
-          <label class="innerControls">
-            HTML video element width:
-            <select id="videoSize" style="float: right">
-              <option value="240px">240px</option>
-              <option value="426px">426px</option>
-              <option value="640px">640px</option>
-              <option value="720px">720px</option>
-              <option value="854px">854px</option>
-              <option value="1280px">1280px</option>
-              <option value="1920px">1920px</option>
-              <option value="80%">Responsive (80%)</option>
-              <option value="100%">Responsive (100%)</option>
-            </select>
-          </label>
-          <label class="innerControls">
-            Current player size:
-            <span id="currentSize"></span>
-          </label>
-          <label class="innerControls">
-            Current video resolution:
-            <span id="currentResolution"></span>
-          </label>
-          <label class="innerControls permalink">
-            Permalink:&nbsp;&nbsp;<span id="StreamPermalink"></span>
-          </label>
+        </label>
+        <label class="innerControls">
+          Current player size:
+          <span id="currentSize"></span>
+        </label>
+        <label class="innerControls">
+          Current video resolution:
+          <span id="currentResolution"></span>
+        </label>
+        <label class="innerControls permalink">
+          Permalink:&nbsp;&nbsp;<span id="StreamPermalink"></span>
+        </label>
+      </div>
+      <div class="config-editor-wrapper">
+        <div class="config-editor-container">
+          <div id="config-editor">Loading...</div>
         </div>
-        <div class="config-editor-wrapper">
-          <div class="config-editor-container">
-            <div id="config-editor">Loading...</div>
-          </div>
-          <div class="config-editor-commands">
-            <label for="config-persistence">
-              Persist
-              <input name="config-persistence" id="config-persistence" type="checkbox" />
-            </label>
-            <button name="config-apply" onclick="applyConfigEditorValue()">
-              Apply
+        <div class="config-editor-commands">
+          <label for="config-persistence">
+            Persist
+            <input name="config-persistence" id="config-persistence" type="checkbox" />
+          </label>
+          <button name="config-apply" onclick="applyConfigEditorValue()">
+            Apply
+          </button>
+        </div>
+      </div>
+    </div>
+    <br />
+    <canvas id="bufferedCanvas" width="720" height="15" class="videoCentered" onclick="onClickBufferedRange(event);"
+      style="height: fit-content"></canvas>
+    <br />
+    <label class="center">Status:</label>
+    <pre id="statusOut" class="center" style="white-space: pre-wrap"></pre>
+    <label class="center">Error:</label>
+    <pre id="errorOut" class="center" style="white-space: pre-wrap"></pre>
+    <div class="center" style="text-align: center; display: none" id="toggleButtons">
+      <button type="button" class="btn btn-sm demo-tab-btn" data-tab="playbackControlTab"
+        onclick="toggleTabClick(this);">
+        Playback
+      </button>
+      <button type="button" class="btn btn-sm demo-tab-btn" data-tab="timelineTab" onclick="toggleTabClick(this);">
+        Timeline
+      </button>
+      <button type="button" class="btn btn-sm demo-tab-btn" data-tab="qualityLevelControlTab"
+        onclick="toggleTabClick(this);">
+        Quality-levels
+      </button>
+      <button type="button" class="btn btn-sm demo-tab-btn" data-tab="audioTrackControlTab"
+        onclick="toggleTabClick(this);">
+        Audio-tracks
+      </button>
+      <button type="button" class="btn btn-sm demo-tab-btn" data-tab="metricsDisplayTab"
+        onclick="toggleTabClick(this); showMetrics();">
+        Real-time metrics
+      </button>
+      <button type="button" class="btn btn-sm demo-tab-btn" data-tab="statsDisplayTab" onclick="toggleTabClick(this);">
+        Buffer &amp; Statistics
+      </button>
+    </div>
+    <div class="center demo-tab" id="playbackControlTab" style="display: none">
+      <br />
+      <center>
+        <p>
+          <span>
+            <button type="button" class="btn btn-sm btn-info" title="video.play()" onclick="$('#video')[0].play()">
+              Play
             </button>
-          </div>
-        </div>
-      </div>
-      <video id="video" controls autoplay playsinline class="videoCentered" style="width: 80%"></video>
-      <br />
-      <canvas id="bufferedCanvas" width="720" height="15" class="videoCentered" onclick="onClickBufferedRange(event);"
-        style="height: fit-content"></canvas>
-      <br />
-      <br />
-      <label class="center">Status:</label>
-      <pre id="statusOut" class="center" style="white-space: pre-wrap"></pre>
-      <label class="center">Error:</label>
-      <pre id="errorOut" class="center" style="white-space: pre-wrap"></pre>
-      <div class="center" style="text-align: center; display: none" id="toggleButtons">
-        <button type="button" class="btn btn-sm demo-tab-btn" data-tab="playbackControlTab"
-          onclick="toggleTabClick(this);">
-          Playback
-        </button>
-        <button type="button" class="btn btn-sm demo-tab-btn" data-tab="timelineTab" onclick="toggleTabClick(this);">
-          Timeline
-        </button>
-        <button type="button" class="btn btn-sm demo-tab-btn" data-tab="qualityLevelControlTab"
-          onclick="toggleTabClick(this);">
-          Quality-levels
-        </button>
-        <button type="button" class="btn btn-sm demo-tab-btn" data-tab="audioTrackControlTab"
-          onclick="toggleTabClick(this);">
-          Audio-tracks
-        </button>
-        <button type="button" class="btn btn-sm demo-tab-btn" data-tab="metricsDisplayTab"
-          onclick="toggleTabClick(this); showMetrics();">
-          Real-time metrics
-        </button>
-        <button type="button" class="btn btn-sm demo-tab-btn" data-tab="statsDisplayTab"
-          onclick="toggleTabClick(this);">
-          Buffer &amp; Statistics
-        </button>
-      </div>
-      <div class="center demo-tab" id="playbackControlTab" style="display: none">
-        <br />
-        <center>
-          <p>
-            <span>
-              <button type="button" class="btn btn-sm btn-info" title="video.play()" onclick="$('#video')[0].play()">
-                Play
-              </button>
-              <button type="button" class="btn btn-sm btn-info" title="video.pause()" onclick="$('#video')[0].pause()">
-                Pause
-              </button>
-            </span>
-            <span>
-              <button type="button" class="btn btn-sm btn-info" title="video.playbackRate = text input"
-                onclick="$('#video')[0].defaultPlaybackRate=$('#video')[0].playbackRate=$('#playback_rate').val();">
-                Playback rate
-              </button>
-              <input type="number" value="1" id="playback_rate" size="8" style="width: 3em"
-                onkeydown="if(window.event.keyCode=='13'){$('#video')[0].defaultPlaybackRate=$('#video')[0].playbackRate=$('#playback_rate').val();}" />
-            </span>
-            <span>
-              <button type="button" class="btn btn-sm btn-info" title="video.currentTime -= 10"
-                onclick="$('#video')[0].currentTime-=10">
-                - 10 s
-              </button>
-              <button type="button" class="btn btn-sm btn-info" title="video.currentTime += 10"
-                onclick="$('#video')[0].currentTime+=10">
-                + 10 s
-              </button>
-            </span>
-            <span>
-              <button type="button" class="btn btn-sm btn-info" title="video.currentTime = text input"
-                onclick="$('#video')[0].currentTime=$('#seek_pos').val();">
-                Seek to
-              </button>
-              <input type="number" id="seek_pos" size="8" style="width: 7em"
-                onkeydown="if(window.event.keyCode=='13'){$('#video')[0].currentTime=$('#seek_pos').val();}" />
-            </span>
-          </p>
-          <p>
-            <span>
-              <button type="button" class="btn btn-xs btn-warning" title="hls.startLoad()" onclick="hls.startLoad()">
-                Start loading
-              </button>
-              <button type="button" class="btn btn-xs btn-warning" title="hls.stopLoad()" onclick="hls.stopLoad()">
-                Stop loading
-              </button>
-            </span>
-            <span>
-              <button type="button" class="btn btn-xs btn-warning" title="hls.attachMedia(video)"
-                onclick="hls.attachMedia($('#video')[0])">
-                Attach media
-              </button>
-              <button type="button" class="btn btn-xs btn-warning" title="hls.detachMedia()"
-                onclick="hls.detachMedia()">
-                Detach media
-              </button>
-            </span>
-          </p>
-          <p>
-            <span>
-              <button type="button" class="btn btn-xs btn-warning" title="hls.recoverMediaError()"
-                onclick="hls.recoverMediaError()">
-                Recover media-error
-              </button>
-              <button type="button" class="btn btn-xs btn-warning" title="hls.swapAudioCodec()"
-                onclick="hls.swapAudioCodec()">
-                Swap audio codec
-              </button>
-            </span>
-          </p>
-          <p>
-            <span>
-              <button type="button" class="btn btn-xs btn-default"
-                onclick="$('#streamSelect')[0].selectedIndex++;$('#streamSelect').change()">
-                Next video
-              </button>
-              <button type="button" class="btn btn-xs btn-default btn-dump" title="Save dumped audio mp4 appends"
-                onclick="createfMP4('audio');">
-                Create audio-fmp4
-              </button>
-              <button type="button" class="btn btn-xs btn-default btn-dump" title="Save dumped video mp4 appends"
-                onclick="createfMP4('video')">
-                Create video-fmp4
-              </button>
-            </span>
-          </p>
-        </center>
-      </div>
-      <div class="center demo-tab demo-timeline-chart-container" id="timelineTab" style="display: none">
-        <canvas id="timeline-chart" style="touch-action: manipulation"></canvas>
-      </div>
-      <div class="center demo-tab" id="qualityLevelControlTab" style="display: none">
-        <center>
-          <table>
-            <tr>
-              <td>
-                <p>Currently played level:</p>
-              </td>
-              <td>
-                <div id="currentLevelControl" style="display: inline"></div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <p>Next level loaded:</p>
-              </td>
-              <td>
-                <div id="nextLevelControl" style="display: inline"></div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <p>Currently loaded level:</p>
-              </td>
-              <td>
-                <div id="loadLevelControl" style="display: inline"></div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <p>Cap-limit level (maximum):</p>
-              </td>
-              <td>
-                <div id="levelCappingControl" style="display: inline"></div>
-              </td>
-            </tr>
-          </table>
-        </center>
-      </div>
-      <div class="center demo-tab" id="audioTrackControlTab" style="display: none">
+            <button type="button" class="btn btn-sm btn-info" title="video.pause()" onclick="$('#video')[0].pause()">
+              Pause
+            </button>
+          </span>
+          <span>
+            <button type="button" class="btn btn-sm btn-info" title="video.playbackRate = text input"
+              onclick="$('#video')[0].defaultPlaybackRate=$('#video')[0].playbackRate=$('#playback_rate').val();">
+              Playback rate
+            </button>
+            <input type="number" value="1" id="playback_rate" size="8" style="width: 3em"
+              onkeydown="if(window.event.keyCode=='13'){$('#video')[0].defaultPlaybackRate=$('#video')[0].playbackRate=$('#playback_rate').val();}" />
+          </span>
+          <span>
+            <button type="button" class="btn btn-sm btn-info" title="video.currentTime -= 10"
+              onclick="$('#video')[0].currentTime-=10">
+              - 10 s
+            </button>
+            <button type="button" class="btn btn-sm btn-info" title="video.currentTime += 10"
+              onclick="$('#video')[0].currentTime+=10">
+              + 10 s
+            </button>
+          </span>
+          <span>
+            <button type="button" class="btn btn-sm btn-info" title="video.currentTime = text input"
+              onclick="$('#video')[0].currentTime=$('#seek_pos').val();">
+              Seek to
+            </button>
+            <input type="number" id="seek_pos" size="8" style="width: 7em"
+              onkeydown="if(window.event.keyCode=='13'){$('#video')[0].currentTime=$('#seek_pos').val();}" />
+          </span>
+        </p>
+        <p>
+          <span>
+            <button type="button" class="btn btn-xs btn-warning" title="hls.startLoad()" onclick="hls.startLoad()">
+              Start loading
+            </button>
+            <button type="button" class="btn btn-xs btn-warning" title="hls.stopLoad()" onclick="hls.stopLoad()">
+              Stop loading
+            </button>
+          </span>
+          <span>
+            <button type="button" class="btn btn-xs btn-warning" title="hls.attachMedia(video)"
+              onclick="hls.attachMedia($('#video')[0])">
+              Attach media
+            </button>
+            <button type="button" class="btn btn-xs btn-warning" title="hls.detachMedia()" onclick="hls.detachMedia()">
+              Detach media
+            </button>
+          </span>
+        </p>
+        <p>
+          <span>
+            <button type="button" class="btn btn-xs btn-warning" title="hls.recoverMediaError()"
+              onclick="hls.recoverMediaError()">
+              Recover media-error
+            </button>
+            <button type="button" class="btn btn-xs btn-warning" title="hls.swapAudioCodec()"
+              onclick="hls.swapAudioCodec()">
+              Swap audio codec
+            </button>
+          </span>
+        </p>
+        <p>
+          <span>
+            <button type="button" class="btn btn-xs btn-default"
+              onclick="$('#streamSelect')[0].selectedIndex++;$('#streamSelect').change()">
+              Next video
+            </button>
+            <button type="button" class="btn btn-xs btn-default btn-dump" title="Save dumped audio mp4 appends"
+              onclick="createfMP4('audio');">
+              Create audio-fmp4
+            </button>
+            <button type="button" class="btn btn-xs btn-default btn-dump" title="Save dumped video mp4 appends"
+              onclick="createfMP4('video')">
+              Create video-fmp4
+            </button>
+          </span>
+        </p>
+      </center>
+    </div>
+    <div class="center demo-tab demo-timeline-chart-container" id="timelineTab" style="display: none">
+      <canvas id="timeline-chart" style="touch-action: manipulation"></canvas>
+    </div>
+    <div class="center demo-tab" id="qualityLevelControlTab" style="display: none">
+      <center>
         <table>
           <tr>
-            <td>Current audio-track:</td>
             <td>
-              <div id="audioTrackControl" style="display: inline"></div>
+              <p>Currently played level:</p>
+            </td>
+            <td>
+              <div id="currentLevelControl" style="display: inline"></div>
             </td>
           </tr>
           <tr>
-            <td>Language / Name:</td>
             <td>
-              <div id="audioTrackLabel" style="display: inline">
-                None selected
-              </div>
+              <p>Next level loaded:</p>
+            </td>
+            <td>
+              <div id="nextLevelControl" style="display: inline"></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <p>Currently loaded level:</p>
+            </td>
+            <td>
+              <div id="loadLevelControl" style="display: inline"></div>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <p>Cap-limit level (maximum):</p>
+            </td>
+            <td>
+              <div id="levelCappingControl" style="display: inline"></div>
             </td>
           </tr>
         </table>
-      </div>
-      <div class="center demo-tab" id="metricsDisplayTab" style="display: none">
-        <br />
-        <div id="metricsButton">
-          <button type="button" class="btn btn-xs btn-info"
-            onclick="$('#metricsButtonWindow').toggle();$('#metricsButtonFixed').toggle();windowSliding=!windowSliding; refreshCanvas()">
-            toggle sliding/fixed window</button><br />
-          <div id="metricsButtonWindow">
-            <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(0)">
-              window ALL
-            </button>
-            <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(2000)">
-              2s
-            </button>
-            <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(5000)">
-              5s
-            </button>
-            <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(10000)">
-              10s
-            </button>
-            <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(20000)">
-              20s
-            </button>
-            <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(30000)">
-              30s
-            </button>
-            <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(60000)">
-              60s
-            </button>
-            <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(120000)">
-              120s</button><br />
-            <button type="button" class="btn btn-xs btn-info" onclick="timeRangeZoomIn()">
-              Window Zoom In
-            </button>
-            <button type="button" class="btn btn-xs btn-info" onclick="timeRangeZoomOut()">
-              Window Zoom Out</button><br />
-            <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSlideLeft()">
-              <<< Window Slide </button>
-                <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSlideRight()">
-                  Window Slide >>></button><br />
-          </div>
-          <div id="metricsButtonFixed">
-            <button type="button" class="btn btn-xs btn-info" onclick="windowStart=$('#windowStart').val()">
-              fixed window start(ms)
-            </button>
-            <input type="text" id="windowStart" defaultValue="0" size="8"
-              onkeydown="if(window.event.keyCode=='13'){windowStart=$('#windowStart').val();}" />
-            <button type="button" class="btn btn-xs btn-info" onclick="windowEnd=$('#windowEnd').val()">
-              fixed window end(ms)
-            </button>
-            <input type="text" id="windowEnd" defaultValue="10000" size="8"
-              onkeydown="if(window.event.keyCode=='13'){windowEnd=$('#windowEnd').val();}" /><br />
-          </div>
-          <button type="button" class="btn btn-xs btn-success" onclick="goToMetrics()" style="font-size: 18px">
-            metrics link
+      </center>
+    </div>
+    <div class="center demo-tab" id="audioTrackControlTab" style="display: none">
+      <table>
+        <tr>
+          <td>Current audio-track:</td>
+          <td>
+            <div id="audioTrackControl" style="display: inline"></div>
+          </td>
+        </tr>
+        <tr>
+          <td>Language / Name:</td>
+          <td>
+            <div id="audioTrackLabel" style="display: inline">
+              None selected
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div class="center demo-tab" id="metricsDisplayTab" style="display: none">
+      <br />
+      <div id="metricsButton">
+        <button type="button" class="btn btn-xs btn-info"
+          onclick="$('#metricsButtonWindow').toggle();$('#metricsButtonFixed').toggle();windowSliding=!windowSliding; refreshCanvas()">
+          toggle sliding/fixed window</button><br />
+        <div id="metricsButtonWindow">
+          <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(0)">
+            window ALL
           </button>
-          <button type="button" class="btn btn-xs btn-success" onclick="goToMetricsPermaLink()" style="font-size: 18px">
-            metrics permalink
+          <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(2000)">
+            2s
           </button>
-          <button type="button" class="btn btn-xs btn-success" onclick="copyMetricsToClipBoard()"
-            style="font-size: 18px">
-            copy metrics to clipboard
+          <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(5000)">
+            5s
           </button>
-          <canvas id="bufferTimerange_c" width="640" height="100" style="border: 1px solid #000000"
-            onmousedown="timeRangeCanvasonMouseDown(event)" onmousemove="timeRangeCanvasonMouseMove(event)"
-            onmouseup="timeRangeCanvasonMouseUp(event)" onmouseout="timeRangeCanvasonMouseOut(event);"></canvas>
-          <canvas id="bitrateTimerange_c" width="640" height="115" style="border: 1px solid #000000"></canvas>
-          <canvas id="bufferWindow_c" width="640" height="100" style="border: 1px solid #000000"
-            onmousemove="windowCanvasonMouseMove(event);"></canvas>
-          <canvas id="videoEvent_c" width="640" height="15" style="border: 1px solid #000000"></canvas>
-          <canvas id="loadEvent_c" width="640" height="15" style="border: 1px solid #000000"></canvas><br />
+          <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(10000)">
+            10s
+          </button>
+          <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(20000)">
+            20s
+          </button>
+          <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(30000)">
+            30s
+          </button>
+          <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(60000)">
+            60s
+          </button>
+          <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSetSliding(120000)">
+            120s</button><br />
+          <button type="button" class="btn btn-xs btn-info" onclick="timeRangeZoomIn()">
+            Window Zoom In
+          </button>
+          <button type="button" class="btn btn-xs btn-info" onclick="timeRangeZoomOut()">
+            Window Zoom Out</button><br />
+          <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSlideLeft()">
+            <<< Window Slide </button>
+              <button type="button" class="btn btn-xs btn-info" onclick="timeRangeSlideRight()">
+                Window Slide >>></button><br />
         </div>
+        <div id="metricsButtonFixed">
+          <button type="button" class="btn btn-xs btn-info" onclick="windowStart=$('#windowStart').val()">
+            fixed window start(ms)
+          </button>
+          <input type="text" id="windowStart" defaultValue="0" size="8"
+            onkeydown="if(window.event.keyCode=='13'){windowStart=$('#windowStart').val();}" />
+          <button type="button" class="btn btn-xs btn-info" onclick="windowEnd=$('#windowEnd').val()">
+            fixed window end(ms)
+          </button>
+          <input type="text" id="windowEnd" defaultValue="10000" size="8"
+            onkeydown="if(window.event.keyCode=='13'){windowEnd=$('#windowEnd').val();}" /><br />
+        </div>
+        <button type="button" class="btn btn-xs btn-success" onclick="goToMetrics()" style="font-size: 18px">
+          metrics link
+        </button>
+        <button type="button" class="btn btn-xs btn-success" onclick="goToMetricsPermaLink()" style="font-size: 18px">
+          metrics permalink
+        </button>
+        <button type="button" class="btn btn-xs btn-success" onclick="copyMetricsToClipBoard()" style="font-size: 18px">
+          copy metrics to clipboard
+        </button>
+        <canvas id="bufferTimerange_c" width="640" height="100" style="border: 1px solid #000000"
+          onmousedown="timeRangeCanvasonMouseDown(event)" onmousemove="timeRangeCanvasonMouseMove(event)"
+          onmouseup="timeRangeCanvasonMouseUp(event)" onmouseout="timeRangeCanvasonMouseOut(event);"></canvas>
+        <canvas id="bitrateTimerange_c" width="640" height="115" style="border: 1px solid #000000"></canvas>
+        <canvas id="bufferWindow_c" width="640" height="100" style="border: 1px solid #000000"
+          onmousemove="windowCanvasonMouseMove(event);"></canvas>
+        <canvas id="videoEvent_c" width="640" height="15" style="border: 1px solid #000000"></canvas>
+        <canvas id="loadEvent_c" width="640" height="15" style="border: 1px solid #000000"></canvas><br />
       </div>
-      <div class="center demo-tab" id="statsDisplayTab" style="display: none">
-        <br />
-        <label>Buffer state:</label>
-        <pre id="bufferedOut"></pre>
-        <label>General stats:</label>
-        <pre id="statisticsOut"></pre>
-      </div>
+    </div>
+    <div class="center demo-tab" id="statsDisplayTab" style="display: none">
+      <br />
+      <label>Buffer state:</label>
+      <pre id="bufferedOut"></pre>
+      <label>General stats:</label>
+      <pre id="statisticsOut"></pre>
     </div>
     <footer><br /><br /><br /><br /><br /><br /></footer>
     <!-- Demo page required libs -->
     <script src="canvas.js"></script>
     <script src="metrics.js"></script>
-    <!-- File drop zone functionality -->
-    <script>
-      document.addEventListener('DOMContentLoaded', function () {
-        const fileDropZone = document.getElementById('fileDropZone');
-        const fileInput = document.getElementById('fileInput');
-        const streamURL = document.getElementById('streamURL');
-        let currentBlobUrl = null; // 追蹤當前的 Blob URL
-        // 清理舊的 Blob URL
-        function cleanupBlobUrl() {
-          if (currentBlobUrl) {
-            URL.revokeObjectURL(currentBlobUrl);
-            currentBlobUrl = null;
-          }
-        }
-        // 點擊區域開啟檔案選擇器
-        fileDropZone.addEventListener('click', function () {
-          fileInput.click();
-        });
-        // 檔案選擇器變更事件
-        fileInput.addEventListener('change', function (e) {
-          const file = e.target.files[0];
-          if (file) {
-            handleFile(file);
-          }
-        });
-        // 拖拉相關事件
-        fileDropZone.addEventListener('dragover', function (e) {
-          e.preventDefault();
-          fileDropZone.classList.add('drag-over');
-        });
-        fileDropZone.addEventListener('dragleave', function (e) {
-          e.preventDefault();
-          fileDropZone.classList.remove('drag-over');
-        });
-        fileDropZone.addEventListener('drop', function (e) {
-          e.preventDefault();
-          fileDropZone.classList.remove('drag-over');
-          const files = e.dataTransfer.files;
-          if (files.length > 0) {
-            const file = files[0];
-            if (file.name.toLowerCase().endsWith('.m3u') || file.name.toLowerCase().endsWith('.m3u8')) {
-              handleFile(file);
-            } else {
-              alert('請選擇有效的 HLS 檔案 (.m3u 或 .m3u8)');
-            }
-          }
-        });
-        function handleFile(file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            const content = e.target.result;
-            // 清理舊的 Blob URL
-            cleanupBlobUrl();
-            // 創建一個 Blob URL 來播放檔案
-            const blob = new Blob([content], { type: 'application/vnd.apple.mpegurl' });
-            const url = URL.createObjectURL(blob);
-            currentBlobUrl = url;
-            // 設置到 URL 輸入框
-            streamURL.value = url;
-            // 更新拖拉區域的顯示
-            const dropZoneText = fileDropZone.querySelector('.file-drop-zone-text');
-            dropZoneText.textContent = '已選擇檔案: ' + file.name;
-            // 清除下拉選單選擇
-            const streamSelect = document.getElementById('streamSelect');
-            if (streamSelect) {
-              streamSelect.value = '';
-            }
-            // 觸發 streamURL 的 change 事件來載入新的串流
-            const changeEvent = new Event('change');
-            streamURL.dispatchEvent(changeEvent);
-            console.log('已載入 HLS 檔案:', file.name);
-            console.log('檔案內容:', content);
-          };
-          reader.readAsText(file);
-        }
-        // 頁面卸載時清理 Blob URL
-        window.addEventListener('beforeunload', cleanupBlobUrl);
-      });
-    </script>
     <!-- demo build -->
     <script src="../dist/hls.js"></script>
     <script src="../dist/hls-demo.js"></script>
+    <script>
+      // 改進的貼上功能
+      function pasteFromClipboard() {
+        const input = document.getElementById('streamURL');
+        input.focus();
+        input.select();
+        // 嘗試現代的剪貼簿 API，但不會卡死
+        if (navigator.clipboard && navigator.clipboard.readText) {
+          navigator.clipboard.readText()
+            .then(text => {
+              if (text.trim()) {
+                input.value = text.trim();
+                // 觸發 change 事件
+                $(input).trigger('change');
+              }
+            })
+            .catch(err => {
+              // 如果失敗，不做任何事，讓用戶手動貼上
+              console.log('Clipboard access failed, please paste manually');
+            });
+        }
+        // 如果沒有剪貼簿 API，用戶可以手動貼上
+      }
+      // 簡單的 StreamPermalink 字符限制
+      function updateStreamPermalink() {
+        const permalinkElement = document.getElementById('StreamPermalink');
+        if (permalinkElement && permalinkElement.textContent) {
+          const originalText = permalinkElement.textContent;
+          if (originalText.length > 32) {
+            permalinkElement.textContent = originalText.substring(0, 32) + '...';
+          }
+        }
+      }
+      // 使用簡單的定時器檢查 StreamPermalink 變化
+      $(document).ready(function () {
+        setInterval(updateStreamPermalink, 1000); // 每秒檢查一次
+      });
+    </script>
   </body>
 
 </html>

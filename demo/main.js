@@ -1835,3 +1835,33 @@ function logStatus(message) {
 function logError(message) {
   appendLog('errorOut', message);
 }
+
+// Function to paste from clipboard
+function pasteFromClipboard() {
+  if (navigator.clipboard && navigator.clipboard.readText) {
+    navigator.clipboard.readText().then(function(text) {
+      document.getElementById('streamURL').value = text;
+      // Trigger change event to update the stream
+      $('#streamURL').change();
+    }).catch(function(err) {
+      // Fallback for older browsers or when clipboard access is denied
+      console.warn('Failed to read clipboard contents: ', err);
+      // Try to use the older execCommand method
+      fallbackPasteFromClipboard();
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackPasteFromClipboard();
+  }
+}
+
+function fallbackPasteFromClipboard() {
+  // For older browsers, we can't automatically paste from clipboard
+  // Show a message to the user
+  alert('Please paste the URL manually using Ctrl+V (or Cmd+V on Mac)');
+  // Focus on the input field
+  document.getElementById('streamURL').focus();
+}
+
+// Make the function globally available
+window.pasteFromClipboard = pasteFromClipboard;
